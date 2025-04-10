@@ -8,6 +8,7 @@ import pandas as pd
 
 def get_cp_data():
 
+# Initialize the driver
     options = Options()
     #options.add_argument("--headless=new")
     options.add_argument("--window-size=1920,1080")
@@ -18,6 +19,7 @@ def get_cp_data():
     website = "https://leetcode.com/contest/"
     driver.get(website)
 
+# Wait until website elements are displayed to evade anti-botting
     try:
         WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.CLASS_NAME, "swiper-wrapper"))
@@ -30,6 +32,7 @@ def get_cp_data():
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
+# Extract data
     raw_data = soup.find('div', class_ = 'swiper-wrapper').text
     duration_str = soup.find_all('div', class_ = 'flex items-center')[1].text.replace("Starts in ", "").strip().split()
     
@@ -72,6 +75,7 @@ def get_cp_data():
     website = "https://codeforces.com/contests"
     driver.get(website)
 
+# Wait until website elements are displayed to evade anti-botting
     try:
         WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.XPATH, "//Table"))
@@ -83,6 +87,7 @@ def get_cp_data():
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
+# Extract data
     table = soup.find('table')
 
     date_times = [element.text.strip() for element in table.find_all('a', target = '_blank') if element.text.strip()]
@@ -101,6 +106,7 @@ def get_cp_data():
     website = "https://www.codechef.com/contests"
     driver.get(website)
 
+# Wait until website elements are displayed to evade anti-botting
     try:
         WebDriverWait(driver, 10).until(
         EC.visibility_of_element_located((By.XPATH, "//Table"))
@@ -112,6 +118,7 @@ def get_cp_data():
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
+# Extract data
     table = soup.find('table')
     rows = table.find_all('tr')
 
@@ -125,6 +132,7 @@ def get_cp_data():
             "Date & Time": row[2].replace('Start', '')
         })
 
+# Convert to pandas dataframe
     df = pd.DataFrame(data)
     print(df)
 

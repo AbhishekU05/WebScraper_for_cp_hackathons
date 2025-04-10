@@ -8,6 +8,7 @@ import pandas as pd
 
 def get_hack_data():
 
+# Initialize the driver
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
@@ -22,6 +23,7 @@ def get_hack_data():
 
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
+# Get contest data and parse the string
     entries = soup.find_all('div', class_ = "challenge-content align-center")
 
     data = []
@@ -36,6 +38,7 @@ def get_hack_data():
             "Date & Time": date_time
         })
 
+# Convert to pandas dataframe
     df = pd.DataFrame(data)
     print(df)
     '''

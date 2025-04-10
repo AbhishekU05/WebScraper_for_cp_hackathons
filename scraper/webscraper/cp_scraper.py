@@ -2,21 +2,51 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 import pandas as pd
 
 def get_cp_data():
 
-    driver = webdriver.Chrome()
-    driver.set_window_size(1920, 1080)
+    options = Options()
+    #options.add_argument("--headless=new")
+    options.add_argument("--window-size=1920,1080")
+    driver = webdriver.Chrome(options = options)
+ 
 
 # Leetcode -----------------------------------------------------
     website = "https://leetcode.com/contest/"
     driver.get(website)
 
+    try:
+        WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.CLASS_NAME, "swiper-wrapper"))
+        )
+    except Exception as e:
+        print("Error: Leetcode did not load in time.")
+        driver.quit()
+        exit()
+
+
     soup = BeautifulSoup(driver.page_source, 'html.parser')
 
     raw_data = soup.find('div', class_ = 'swiper-wrapper').text
+    duration_str = soup.find_all('div', class_ = 'flex items-center')[1].text.replace("Starts in ", "").strip().split()
+    
+    days = hours = minutes = seconds = 0
+
+    for part in duration_str:
+        if part.endswith('d'):
+            days = int(part[:-1])
+        elif part.endswith('h'):
+            hours = int(part[:-1])
+        elif part.endswith('m'):
+            minutes = int(part[:-1])
+        elif part.endswith('s'):
+            seconds = int(part[:-1])
+
+    total_days = days + hours / 24 + minutes / 1440 + seconds / 86400
+    print(total_days)
 
     entries = [entry.strip() for entry in raw_data.split("Starts in") if entry.strip()]
 
@@ -27,7 +57,7 @@ def get_cp_data():
 
         for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']:
             if day in entry:
-                name = entry[:entry.index(day)].strip()
+                name = "LeetCode " + entry[:entry.index(day)].strip()
                 date_time = entry[entry.index(day):].strip()
                 break
         else:
@@ -48,7 +78,7 @@ def get_cp_data():
         EC.visibility_of_element_located((By.XPATH, "//Table"))
         )
     except Exception as e:
-        print("Error: Table did not load in time.")
+        print("Error: Codeforces did not load in time.")
         driver.quit()
         exit()
 
@@ -77,7 +107,7 @@ def get_cp_data():
         EC.visibility_of_element_located((By.XPATH, "//Table"))
         )
     except Exception as e:
-        print("Error: Table did not load in time.")
+        print("Error: Codechef did not load in time.")
         driver.quit()
         exit()
 
@@ -92,7 +122,7 @@ def get_cp_data():
         if not row:
             continue
         data.append({
-            "Name": row[1].replace('Name', ''),
+            "Name": "Codechef " + row[1].replace('Name', ''),
             "Date & Time": row[2].replace('Start', '')
         })
 
@@ -103,3 +133,5 @@ def get_cp_data():
 
  
     return df
+
+get_cp_data()

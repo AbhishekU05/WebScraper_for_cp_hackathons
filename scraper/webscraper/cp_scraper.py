@@ -46,7 +46,6 @@ def get_cp_data():
             seconds = int(part[:-1])
 
     total_days = days + hours / 24 + minutes / 1440 + seconds / 86400
-    print(total_days)
 
     entries = [entry.strip() for entry in raw_data.split("Starts in") if entry.strip()]
 
